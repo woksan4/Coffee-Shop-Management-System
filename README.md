@@ -1,90 +1,113 @@
 # Coffee Shop Management System
 
-A clean rebuild of the university project using React, Express, and MySQL. The previous implementation is retained only as a reference; this version uses a new schema and a new API and does not depend on the old customer/table-order workflow.
+A full-stack coffee shop management application developed as a university project. It supports day-to-day shop operations through a React frontend, a Node.js/Express API, and a MySQL database.
 
-## Included in this first implementation
+## Features
 
-- Manager and cashier login with role-based API authorization.
-- Product catalogue and categories; cashier cannot change prices.
-- Ingredient inventory with receiving, waste, and stock-count adjustments.
-- One recipe per active product, with measured ingredient quantities.
-- POS with a pre-payment ingredient check and a second check during the sale transaction.
-- Cash sale, unique order number, inventory movements, immutable sold-item/ingredient snapshots, and receipt reprint.
-- Order preparation status, cancellation records, employee account management, refund recording, sales reports, and audit log.
-- Parameterized SQL, password hashing, rate-limited login, environment-based secrets, and database transactions.
+- Role-based access for managers and cashiers
+- Product and category management
+- Ingredient inventory tracking
+- Product recipes and ingredient consumption
+- Point of Sale (POS) and order processing
+- Order preparation status and receipt printing
+- Employee account management
+- Sales reporting
+- Stock movement and order records
+
+## Technology Stack
+
+- **Frontend:** React, Vite
+- **Backend:** Node.js, Express
+- **Database:** MySQL / MariaDB
+- **Database administration:** phpMyAdmin (available through XAMPP)
 
 ## Requirements
 
-- Node.js 20 or newer
-- MySQL 8.0 or newer
+Install the following before running the application:
 
-## 1. Create the database
+- Node.js and npm
+- XAMPP (or another compatible MySQL/MariaDB installation)
+- Git (optional, for cloning the repository)
 
-Run `database/schema.sql` in MySQL Workbench or the MySQL command line. It creates a new `coffee_shop` database and does **not** drop or overwrite any existing database.
+## Setup
 
-Recommended: create a dedicated MySQL user instead of using `root`:
+### 1. Get the source code
 
-```sql
-CREATE USER 'coffee_app'@'localhost' IDENTIFIED BY 'choose_a_strong_database_password';
-GRANT SELECT, INSERT, UPDATE, DELETE ON coffee_shop.* TO 'coffee_app'@'localhost';
-FLUSH PRIVILEGES;
+Clone the repository:
+
+```bash
+git clone https://github.com/woksan4/Coffee-Shop-Management-System.git
+cd Coffee-Shop-Management-System
 ```
 
-Run the schema first as a database administrator, then use the dedicated user for the application.
+Alternatively, download the repository as a ZIP file from GitHub and extract it.
 
-## 2. Configure and start the backend
+### 2. Set up the database
+
+1. Start MySQL from the XAMPP Control Panel.
+2. Open phpMyAdmin at `http://localhost/phpmyadmin`.
+3. Create a database named `coffee_shop` if it does not already exist.
+4. Select the `coffee_shop` database and import `database/coffee_shop.sql`.
+
+The SQL file contains the project's demonstration database. Use it only for local development and demonstrations.
+
+### 3. Configure the backend
+
+1. Open the `backend` directory.
+2. Copy `.env.example` to a new file named `.env`.
+3. Open `backend/.env` and enter the local database connection settings and other required values. Use the variable names already provided in `.env.example`.
+4. Do not commit or publish `.env`; it may contain local credentials and secrets.
+
+Install dependencies and start the API:
 
 ```bash
 cd backend
-cp .env.example .env
-```
-
-Edit `.env` with your database credentials. Set `JWT_SECRET` to a random secret at least 32 characters long. Add initial manager credentials to `.env`:
-
-```env
-INITIAL_MANAGER_USERNAME=manager
-INITIAL_MANAGER_PASSWORD=choose_a_long_unique_password
-INITIAL_MANAGER_NAME=Coffee Shop Manager
-```
-
-Then run:
-
-```bash
 npm install
-npm run seed:manager
 npm run dev
 ```
 
-The manager seed command creates one manager account and refuses to overwrite an existing username. It does not store a default password in source code.
+Keep this terminal running. The backend is expected to use port `5000` for the local API.
 
-## 3. Start the frontend
+### 4. Configure the frontend
 
-In a second terminal:
+In a second terminal, open the `frontend` directory and install its dependencies:
 
 ```bash
 cd frontend
-cp .env.example .env
 npm install
+```
+
+Create `frontend/.env` based on `frontend/.env.example`. For a local backend, the API URL should be:
+
+```env
+VITE_API_URL=http://localhost:5000/api
+```
+
+Start the frontend:
+
+```bash
 npm run dev
 ```
 
-Open the local URL printed by Vite (normally `http://localhost:5173`). The API defaults to `http://localhost:3000/api`.
+Open the local address printed by Vite in the terminal, usually `http://localhost:5173`.
 
-## 4. Suggested first-time setup
+## Project Structure
 
-1. Sign in as the manager.
-2. In **Inventory**, add ingredients and record opening quantities as `Stock received` movements.
-3. In **Products**, add products and prices.
-4. In **Recipes**, define the ingredient quantities for one unit of each product.
-5. Create cashier accounts in **Employees**.
-6. Use **Point of Sale** to check ingredients and confirm cash sales.
+```text
+Coffee-Shop-Management-System/
+├── backend/       # Express API, routes, and database access
+├── frontend/      # React user interface
+├── database/      # SQL schema and demonstration database
+├── .gitignore
+└── README.md
+```
 
-Products without recipes are intentionally blocked from sale. This avoids selling a product while the system cannot calculate its ingredient consumption.
+## Security Notes
 
-## Notes and current boundaries
+- Never commit `.env` files, database passwords, JWT secrets, or other private credentials.
+- The included database is intended for project demonstration and local testing.
+- Before deploying this application publicly, review authentication, authorization, validation, database permissions, error handling, and production configuration.
 
-- This is an educational first implementation, not a certified fiscal/POS system.
-- Payment method is cash only. Refund entries must be created only after cash is actually returned.
-- The first version does not include supplier management, tax rules, customer accounts, tables, delivery, manual discounts, or cashier price editing.
-- The order endpoint requires an `Idempotency-Key` and stores it uniquely, so a retry with the same key returns the existing sale rather than creating another order.
-- For production deployment, use HTTPS, backups, restricted network access, and a deployment-specific secret manager.
+## Academic Project
+
+This project was created for educational purposes to demonstrate full-stack application development, database integration, role-based access control, inventory management, and sales workflows.
